@@ -21,15 +21,15 @@ pipeline {
             }
         }
 
-        stage('Deploy with Automatic Rollback') {
-            steps {
-                echo 'Deploying application...'
+      stage('Deploy with Automatic Rollback') {
+    steps {
+        echo 'Deploying application...'
 
-                powershell """
-                    powershell -ExecutionPolicy Bypass -File .\\scripts\\deploy.ps1 -Version ${BUILD_NUMBER}
-                """
-            }
-        }
+        bat """
+            powershell.exe -ExecutionPolicy Bypass -File scripts\\deploy.ps1 -Version ${BUILD_NUMBER}
+        """
+    }
+}
     }
 
     post {
