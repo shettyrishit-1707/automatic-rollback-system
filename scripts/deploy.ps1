@@ -81,13 +81,21 @@ if (-not $healthy) {
     docker rm -f $TestContainer
 
     if (docker image inspect $PreviousImage 2>$null) {
-        & ".\scripts\rollback.ps1" -PreviousImage $PreviousImage
-    }
-    else {
-        Write-Host "No previous version available."
+    & ".\scripts\rollback.ps1" -PreviousImage $PreviousImage
+
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host ""
+        Write-Host "ROLLBACK SUCCESSFUL."
+        exit 0
     }
 
+    Write-Host "ROLLBACK FAILED."
     exit 1
+}
+else {
+    Write-Host "No previous version available."
+    exit 1
+}
 }
 
 # New version passed
@@ -148,6 +156,16 @@ Write-Host ""
 Write-Host "Production health check failed."
 Write-Host "Starting automatic rollback..."
 
-& ".\scripts\rollback.ps1" -PreviousImage $PreviousImage
+$rollbackResult = & ".\scripts\rollback.ps1" -PreviousImage $PreviousImage
 
+if ($LASTEXITCODE -eq 0) {
+    Write-Host ""
+    Write-Host "======================================"
+    Write-Host "   DEPLOYMENT FAILED"
+    Write-Host "   ROLLBACK SUCCESSFUL"
+    Write-Host "======================================"
+    exit 0
+}
+
+Write-Host "ROLLBACK FAILED."
 exit 1
